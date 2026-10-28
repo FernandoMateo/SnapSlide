@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sky: #00bfff;
+  --color-sky-soft: #e6f8ff;
+  --color-sky-deep: #0090d0;
+  --color-abyss: #0a3fbf;
+  --color-ink: #0b1b2b;
+  --color-ink-soft: #4a5b6d;
+  --color-ink-faint: #8a99a8;
+  --color-mist: #f4f8fb;
+  --color-line: #e3ebf2;
+  --color-danger: #ff3b5c;
+  --color-warn: #ff9f1c;
+  --color-ok: #12b886;
+
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 20px 50px -24px rgb(11 27 43 / 0.18);
+  --shadow-glow: 0 0 0 1px rgb(0 191 255 / 0.35), 0 12px 40px -8px rgb(0 191 255 / 0.55);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(0 191 255 / 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sky);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .glass {
+    background: rgb(255 255 255 / 0.62);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgb(255 255 255 / 0.75);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--color-line);
+    border-radius: 22px;
+    box-shadow: 0 18px 40px -30px rgb(11 27 43 / 0.25);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.925rem;
+    transition:
+      transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 160ms ease,
+      box-shadow 200ms ease,
+      color 160ms ease;
+    user-select: none;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .btn-primary {
+    background: var(--color-sky);
+    color: #ffffff;
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-ghost {
+    background: rgb(255 255 255 / 0.7);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+  }
+  .btn-dark {
+    background: var(--color-ink);
+    color: #ffffff;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background: var(--color-sky-deep);
+    }
+    .btn-ghost:hover {
+      border-color: var(--color-sky);
+      color: var(--color-sky-deep);
+    }
+    .btn-dark:hover {
+      background: #16314b;
+    }
+  }
+
+  .field {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 14px;
+    border: 1px solid var(--color-line);
+    background: #ffffff;
+    padding: 0.6rem 0.9rem;
+    font-size: 16px;
+    color: var(--color-ink);
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-sky);
+    box-shadow: 0 0 0 4px rgb(0 191 255 / 0.15);
+  }
+  .label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    margin-bottom: 0.4rem;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* La intro solo se pinta en la primera visita de la sesión */
+.intro-seen [data-intro-root] {
+  display: none;
+}
+
+/* Alerta de reabastecimiento: pulso rojo/naranja */
+@keyframes stock-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 59 92 / 0);
+    border-color: rgb(255 59 92 / 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(255 59 92 / 0.14);
+    border-color: rgb(255 59 92 / 1);
+  }
+}
+@keyframes stock-pulse-warn {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 159 28 / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(255 159 28 / 0.16);
+  }
+}
+.pulse-danger {
+  animation: stock-pulse 1.4s ease-in-out infinite;
+}
+.pulse-warn {
+  animation: stock-pulse-warn 1.8s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) rotate(6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
