@@ -7,6 +7,8 @@
 ```
 src/app/                 Rutas (App Router): / landing · /login · /dashboard/{,products,inventory,sales,sales/new,clients}
 src/components/landing/  IntroSheet (animación de la hoja), Navbar, Hero, Manifesto, ProductShowcase, B2BSection, Footer
+src/components/product/  Box3D (caja CSS 3D con el frente real), BoxStory (historia con scroll), Sparkle · el estudio interactivo es public/caja-3d.html (HTML del cliente, sin modificar) incrustado en StudioSection y en /caja con ?lang=
+public/products/         box-original.jpg / box-floral.jpg: frentes enderezados desde las fotos reales · public/brand/logo.png: logo oficial (se usa como máscara)
 src/components/dashboard/ ui.tsx (Table, Drawer, StatusBadge, Segmented…), charts.tsx (SVG), ProductCodes
 src/i18n/                es.ts (fuente + tipo Dictionary), en.ts, I18nProvider (useI18n: d, t, money, date)
 src/lib/                 types.ts · business.ts (reglas puras) · store.ts (Zustand + persist) · dates.ts

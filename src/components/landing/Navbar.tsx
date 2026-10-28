@@ -3,7 +3,7 @@
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { Logo, LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -14,7 +14,7 @@ export function Navbar() {
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
 
   const links = [
-    { href: "#productos", label: d.nav.products },
+    { href: "#la-caja", label: d.nav.products },
     { href: "#beneficios", label: d.nav.benefits },
     { href: "#distribucion", label: d.nav.distribution },
   ];
@@ -27,12 +27,7 @@ export function Navbar() {
         }`}
       >
         <Link href="/" aria-label="Snap Slide" className="shrink-0">
-          <span className="min-[440px]:hidden">
-            <LogoMark className="h-8 w-8" />
-          </span>
-          <span className="hidden min-[440px]:block">
-            <Logo />
-          </span>
+          <Logo className="block h-10 sm:h-11" />
         </Link>
 
         <ul className="hidden items-center gap-1 text-sm font-semibold text-ink-soft md:flex">

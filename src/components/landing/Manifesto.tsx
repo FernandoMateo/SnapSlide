@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useRef } from "react";
+import { PetalCluster } from "@/components/fx/Petals";
 import { useI18n } from "@/i18n/I18nProvider";
 
 const ICONS = [
@@ -20,19 +21,20 @@ export function Manifesto() {
   const words = d.manifesto.line.split(" ");
 
   return (
-    <section id="beneficios" className="relative mx-auto max-w-7xl scroll-mt-24 px-4 py-28 sm:px-8 sm:py-40">
+    <section id="beneficios" className="relative mx-auto max-w-7xl scroll-mt-24 px-5 py-20 sm:px-8 sm:py-32 lg:py-40">
       <p className="mb-8 text-xs font-bold uppercase tracking-[0.3em] text-sky-deep">{d.manifesto.kicker}</p>
-      <div ref={ref}>
-        <p className="max-w-5xl font-display text-[clamp(1.9rem,4.6vw,4rem)] font-bold leading-[1.08] tracking-[-0.03em] text-ink">
+      <div ref={ref} className="relative">
+        <PetalCluster className="-top-14 right-0 lg:right-[6%]" />
+        <h2 className="max-w-5xl font-display text-[clamp(1.9rem,4.6vw,4rem)] font-bold leading-[1.08] tracking-[-0.03em] text-ink">
           {words.map((w, i) => (
             <Word key={`${w}-${i}`} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>
               {w}
             </Word>
           ))}
-        </p>
+        </h2>
       </div>
 
-      <div className="mt-20 grid gap-4 md:grid-cols-[1.3fr_1fr_1fr]">
+      <div className="mt-14 grid gap-4 sm:mt-20 md:grid-cols-[1.3fr_1fr_1fr]">
         {d.manifesto.pillars.map((p, i) => (
           <motion.article
             key={p.title}
@@ -57,7 +59,7 @@ export function Manifesto() {
 }
 
 function Word({ children, progress, range }: { children: string; progress: MotionValue<number>; range: [number, number] }) {
-  const opacity = useTransform(progress, range, [0.14, 1]);
+  const opacity = useTransform(progress, range, [0.22, 1]);
   return (
     <motion.span style={{ opacity }} className="mr-[0.25em] inline-block">
       {children}

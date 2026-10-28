@@ -8,7 +8,9 @@ import { Hero } from "@/components/landing/Hero";
 import { IntroSheet } from "@/components/landing/IntroSheet";
 import { Manifesto } from "@/components/landing/Manifesto";
 import { Navbar } from "@/components/landing/Navbar";
-import { ProductShowcase } from "@/components/landing/ProductShowcase";
+import { PetalDrift } from "@/components/fx/Petals";
+import { StudioSection } from "@/components/landing/StudioSection";
+import { BoxStory } from "@/components/product/BoxStory";
 
 export default function LandingPage() {
   const [introDone, setIntroDone] = useState(false);
@@ -27,11 +29,13 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
+      <PetalDrift />
       <Navbar />
       <main>
         <Hero ready={introDone} />
         <Manifesto />
-        <ProductShowcase />
+        <BoxStory />
+        <StudioSection />
         <B2BSection />
       </main>
       <Footer />

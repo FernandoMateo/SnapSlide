@@ -39,7 +39,6 @@ export default function LoginPage() {
         className="relative hidden overflow-hidden lg:block"
         style={{ background: "radial-gradient(120% 90% at 30% 20%, #00BFFF 0%, #0A7FE0 45%, #0A3FBF 100%)" }}
       >
-        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:56px_56px]" />
         <div className="absolute left-10 top-10">
           <Logo tone="light" />
         </div>

@@ -2,6 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { PetalCluster } from "@/components/fx/Petals";
+import { WaterTitle } from "@/components/fx/WaterTitle";
 import { useI18n } from "@/i18n/I18nProvider";
 
 /** Puntos de distribución abstractos alrededor de Miami (posiciones decorativas, no geográficas). */
@@ -25,12 +27,16 @@ export function B2BSection() {
         className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] px-5 py-16 text-white sm:px-12 sm:py-20"
         style={{ background: "radial-gradient(120% 120% at 15% 0%, #00BFFF 0%, #0A7FE0 40%, #0A3FBF 100%)" }}
       >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:56px_56px]" />
-
         <div className="relative grid gap-14 lg:grid-cols-[1.05fr_1fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/75">{d.b2b.kicker}</p>
-            <h2 className="mt-5 font-display text-[clamp(2.2rem,5vw,4.2rem)] font-extrabold leading-[0.98] tracking-[-0.035em]">{d.b2b.title}</h2>
+            <div className="relative">
+              <WaterTitle
+                lines={[d.b2b.title]}
+                className="mt-5 font-display text-[clamp(2.1rem,9vw,4.2rem)] font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-[clamp(2.2rem,5vw,4.2rem)]"
+              />
+              <PetalCluster className="-top-8 right-0" scale={0.9} />
+            </div>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/85">{d.b2b.lead}</p>
 
             <DistributionRadar />

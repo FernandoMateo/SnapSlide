@@ -115,7 +115,56 @@ git push -u origin main
 
 `.gitignore` ya excluye `node_modules/`, `.next/`, `.env*` y `.claude/settings.local.json`.
 
-## Despliegue (Vercel)
+## Despliegue en VPS (recomendado)
+
+Todo corre en un solo servidor (Ubuntu 22.04/24.04, 1 GB de RAM alcanza): Next.js con PM2, PocketBase con systemd y Nginx delante con HTTPS. Los archivos de configuración están en `deploy/`.
+
+```bash
+# 1. Dependencias del sistema (una vez)
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs nginx certbot python3-certbot-nginx git
+sudo npm i -g pm2
+
+# 2. Código
+sudo mkdir -p /var/www/snapslide && sudo chown $USER /var/www/snapslide
+git clone https://github.com/FernandoMateo/SnapSlide.git /var/www/snapslide
+cd /var/www/snapslide
+
+# 3. Variables (NEXT_PUBLIC_* se graban en el build: definirlas ANTES de compilar)
+cp .env.example .env.production
+nano .env.production          # NEXT_PUBLIC_SITE_URL=https://tudominio.com
+
+# 4. Build y arranque
+npm ci
+npm run build
+pm2 start deploy/ecosystem.config.cjs && pm2 save && pm2 startup
+
+# 5. Nginx + HTTPS (edita el dominio dentro del archivo)
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/snapslide
+sudo ln -s /etc/nginx/sites-available/snapslide /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d tudominio.com -d www.tudominio.com
+```
+
+**Actualizar después de un cambio:** `git pull && npm ci && npm run build && pm2 reload snapslide`.
+
+**Comprobar que todo está bien:**
+- `https://tudominio.com/robots.txt` y `/sitemap.xml` deben mostrar el dominio real (si muestran `localhost`, faltó `NEXT_PUBLIC_SITE_URL` antes del build).
+- Comparte la URL en WhatsApp o prueba en <https://www.opengraph.xyz> para ver la tarjeta con la imagen.
+- Da de alta el dominio en Google Search Console y envía `https://tudominio.com/sitemap.xml`.
+
+**PocketBase en el mismo VPS** (cuando el frontend se conecte): descarga el binario de Linux en `pocketbase/`, crea el usuario `snapslide`, copia `deploy/pocketbase.service` a `/etc/systemd/system/` y activa `systemctl enable --now pocketbase`. El bloque `api.` de `deploy/nginx.conf` lo publica con HTTPS.
+
+## SEO incluido
+
+- Título, descripción y palabras clave; Open Graph y Twitter con `public/og.jpg` (1200×630).
+- `robots.txt` (bloquea `/login` y `/dashboard`), `sitemap.xml`, `manifest.webmanifest`, favicon e íconos.
+- URL canónica por página; el login y el sistema interno llevan `noindex`.
+- Datos estructurados schema.org: Organization, WebSite y los dos Product.
+- Un solo `h1` por página y encabezados en orden; página 404 propia.
+- Todo se configura en `src/lib/site.ts` y `NEXT_PUBLIC_SITE_URL`.
+
+## Despliegue alternativo (Vercel)
 
 1. En <https://vercel.com/new>, importa el repositorio `FernandoMateo/SnapSlide`.
 2. Vercel detecta Next.js automáticamente. No hace falta configurar nada mientras se usen los datos demo.

@@ -103,9 +103,6 @@ export function IntroSheet({ onDone }: { onDone: () => void }) {
       className="fixed inset-0 z-[100] overflow-hidden"
       style={{ background: "radial-gradient(120% 90% at 50% 40%, #00BFFF 0%, #0A7FE0 45%, #0A3FBF 100%)" }}
     >
-      {/* Grano sutil para que el degradado no se vea plano */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-overlay [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:3px_3px]" />
-
       <div className="absolute inset-0 grid place-items-center">
         {/* 1 · Línea de luz */}
         <div
@@ -166,7 +163,7 @@ export function IntroSheet({ onDone }: { onDone: () => void }) {
 
         {/* 6 · Logo */}
         <div data-logo className="absolute opacity-0">
-          <Logo className="scale-[1.9] sm:scale-[2.6]" />
+          <Logo className="h-28 sm:h-40" />
         </div>
       </div>
 

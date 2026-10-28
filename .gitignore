@@ -19,3 +19,6 @@ pocketbase/pb_data/
 pocketbase/pocketbase
 pocketbase/pocketbase.exe
 pocketbase/*.zip
+
+# Generado por Next.js en desarrollo
+AGENTS.md

@@ -3,7 +3,8 @@
 @theme {
   --color-sky: #00bfff;
   --color-sky-soft: #e6f8ff;
-  --color-sky-deep: #0090d0;
+  /* Celeste profundo con contraste AA sobre blanco para textos pequeños */
+  --color-sky-deep: #0074b0;
   --color-abyss: #0a3fbf;
   --color-ink: #0b1b2b;
   --color-ink-soft: #4a5b6d;
@@ -188,6 +189,95 @@ body {
   }
   50% {
     transform: translate3d(2%, -3%, 0) rotate(6deg);
+  }
+}
+
+/* La caja: agua, burbujas y destellos */
+@keyframes wave {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes bubble {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-28vh) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+/* Pétalos celestes */
+@keyframes petal-fall {
+  from {
+    transform: translate3d(0, -12vh, 0);
+  }
+  to {
+    transform: translate3d(-8vw, 112vh, 0);
+  }
+}
+
+@keyframes petal-sway {
+  from {
+    transform: translateX(-28px) rotate(-30deg);
+  }
+  to {
+    transform: translateX(28px) rotate(42deg);
+  }
+}
+
+@keyframes petal-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(calc(var(--r, 0deg) + 16deg));
+  }
+}
+
+/* Títulos que emergen del agua */
+@keyframes bubble-up {
+  0% {
+    transform: translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-1.6em) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Ondas en el agua bajo las cajas de la home */
+@keyframes ripple {
+  from {
+    transform: scale(0.35);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
   }
 }
 

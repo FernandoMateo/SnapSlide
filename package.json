@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "description": "Snap Slide — landing de lanzamiento + sistema de gestión interno (ERP/CRM).",
   "scripts": {
     "dev": "next dev",

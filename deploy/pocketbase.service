@@ -1,0 +1,19 @@
+# systemd: PocketBase como servicio en el VPS (arranca solo y se reinicia si falla).
+# Copia a /etc/systemd/system/pocketbase.service, ajusta las rutas y ejecuta:
+#   systemctl daemon-reload && systemctl enable --now pocketbase
+[Unit]
+Description=Snap Slide · PocketBase
+After=network.target
+
+[Service]
+Type=simple
+User=snapslide
+Group=snapslide
+LimitNOFILE=4096
+Restart=always
+RestartSec=5s
+WorkingDirectory=/var/www/snapslide/pocketbase
+ExecStart=/var/www/snapslide/pocketbase/pocketbase serve --http=127.0.0.1:8090 --dir=/var/www/snapslide/pocketbase/pb_data --migrationsDir=/var/www/snapslide/pocketbase/pb_migrations --hooksDir=/var/www/snapslide/pocketbase/pb_hooks
+
+[Install]
+WantedBy=multi-user.target
