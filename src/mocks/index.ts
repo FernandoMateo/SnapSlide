@@ -3,7 +3,8 @@
  * Las fechas se generan relativas a "hoy" para que el demo siempre se vea vigente,
  * con un generador pseudoaleatorio con semilla: mismos datos en cada reinicio.
  */
-import { addDays, today } from "@/lib/dates";
+// Import relativo con extensión: este archivo también lo ejecuta Node directo (scripts/seed-pocketbase.mts).
+import { addDays, today } from "../lib/dates.ts";
 import type { Client, Expense, Movement, Payment, PaymentMethod, Product, Sale, SaleItem, User } from "@/lib/types";
 
 function mulberry32(seed: number) {

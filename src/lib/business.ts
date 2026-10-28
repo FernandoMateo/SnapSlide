@@ -1,6 +1,7 @@
 /**
  * Reglas de negocio puras (sin React). Todo lo que la UI muestra sale de aquí,
- * así que al conectar el backend estas funciones se reutilizan o se trasladan a SQL.
+ * así que al conectar PocketBase estas funciones se reutilizan sobre los datos que devuelve la API.
+ * Lo que debe ser atómico (FEFO al vender, movimientos) vive además en pocketbase/pb_hooks.
  */
 import { addDays, daysBetween, isSameMonth, today } from "./dates";
 import type { Client, Expense, Lot, Payment, Product, Sale, User } from "./types";

@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-Snap Slide (Miami, FL · detergente en Hojas y Líquido): landing de lanzamiento pública + ERP/CRM privado con roles Owner (acceso total) y Vendedor (visión túnel: solo sus ventas). 100% bilingüe ES/EN. Datos mock en el navegador; backend previsto en Supabase (`supabase/schema.sql`). Detalle completo en `README.md`.
+Snap Slide (Miami, FL · detergente en Hojas y Líquido): landing de lanzamiento pública + ERP/CRM privado con roles Owner (acceso total) y Vendedor (visión túnel: solo sus ventas). 100% bilingüe ES/EN. Datos mock en el navegador; backend en PocketBase v0.40 (`pocketbase/`: migraciones con reglas por rol + hooks JS; cliente en `src/lib/pocketbase.ts`). Detalle completo en `README.md`.
 
 **Tech Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · Zustand
 

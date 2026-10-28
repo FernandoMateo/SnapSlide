@@ -13,3 +13,9 @@ npm-debug.log*
 Thumbs.db
 .vercel
 .claude/settings.local.json
+
+# PocketBase: datos locales y binario (se descarga por plataforma)
+pocketbase/pb_data/
+pocketbase/pocketbase
+pocketbase/pocketbase.exe
+pocketbase/*.zip

@@ -206,6 +206,8 @@ const es = {
     insufficient: "Stock insuficiente en ese lote.",
     badQty: "Ingresa una cantidad válida.",
     noProduct: "Selecciona un producto.",
+    noLot: "Indica el código de lote.",
+    badType: "Tipo de movimiento inválido.",
     done: "Movimiento registrado.",
     levels: { out: "Sin stock", critical: "Crítico", low: "Bajo", ok: "OK" },
   },

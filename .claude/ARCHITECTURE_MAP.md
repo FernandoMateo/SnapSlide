@@ -11,7 +11,8 @@ src/components/dashboard/ ui.tsx (Table, Drawer, StatusBadge, Segmented…), cha
 src/i18n/                es.ts (fuente + tipo Dictionary), en.ts, I18nProvider (useI18n: d, t, money, date)
 src/lib/                 types.ts · business.ts (reglas puras) · store.ts (Zustand + persist) · dates.ts
 src/mocks/               Base de datos demo generada con semilla, fechas relativas a hoy
-supabase/schema.sql      Tablas + RLS para el backend real
+pocketbase/              pb_migrations (colecciones + API rules por rol) · pb_hooks (rutas /api/snapslide/*, cobro automático)
+scripts/seed-pocketbase.mts  Carga los mocks en PocketBase (npm run seed:pb)
 ```
 
 ## Key File Locations

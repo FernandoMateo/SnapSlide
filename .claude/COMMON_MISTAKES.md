@@ -25,7 +25,7 @@
 
 ### 4. Permisos solo en la UI
 
-**Fix**: toda acción nueva del store debe validar con `can()` / `canEditSale()` como las existentes; en backend, replicar con RLS (`supabase/schema.sql`).
+**Fix**: toda acción nueva del store debe validar con `can()` / `canEditSale()` como las existentes; en backend, replicar en las API rules de `pocketbase/pb_migrations` (nueva migración, no editar la ya aplicada). En `pb_hooks`, cada handler corre aislado: no puede usar variables o funciones definidas fuera de él.
 
 ### 5. Cambiar la forma de los mocks sin subir la versión de persistencia
 

@@ -2,17 +2,20 @@
   "name": "snapslide",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Snap Slide — landing de lanzamiento + sistema de gestión interno (ERP/CRM).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:pb": "node scripts/seed-pocketbase.mts"
   },
   "dependencies": {
     "framer-motion": "^14.7.1",
     "jsbarcode": "^3.12.3",
     "next": "^16.4.3",
+    "pocketbase": "^0.28.1",
     "qrcode": "^1.5.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

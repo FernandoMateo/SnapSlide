@@ -16,7 +16,7 @@ Todo es bilingüe (ES/EN), con un selector de idioma siempre visible.
 | Animación | Framer Motion |
 | Estado | Zustand con persistencia en `localStorage` (simula el backend) |
 | Códigos | `qrcode` (QR) y `jsbarcode` (CODE128) |
-| Backend (siguiente paso) | Supabase / Postgres: esquema y RLS en `supabase/schema.sql` |
+| Backend (siguiente paso) | PocketBase v0.40: colecciones, reglas de acceso y hooks en `pocketbase/` |
 
 ## Arquitectura de carpetas
 
@@ -44,10 +44,14 @@ src/
 ├── lib/
 │   ├── types.ts                # Modelo de datos
 │   ├── business.ts             # Reglas de negocio puras: permisos, FEFO, comisiones, flujo de caja, CLV
-│   ├── store.ts                # Estado global + acciones que validan permisos
+│   ├── store.ts                # Estado global + acciones que validan permisos (modo demo)
+│   ├── pocketbase.ts           # Cliente del SDK + llamadas a las rutas propias del backend
 │   └── dates.ts
 └── mocks/index.ts              # mockUsers, mockProducts, mockClients, mockSales, pagos, gastos
-supabase/schema.sql             # Tablas + Row Level Security para el backend real
+pocketbase/
+├── pb_migrations/              # Colecciones + reglas de acceso por rol
+└── pb_hooks/snapslide.pb.js    # Rutas transaccionales: pedidos (FEFO) y movimientos; cobro automático
+scripts/seed-pocketbase.mts     # Carga los datos demo en PocketBase
 ```
 
 ## Reglas de negocio implementadas
@@ -82,7 +86,7 @@ npm run typecheck
 
 Los datos viven en el navegador. "Restaurar datos demo" (en la barra lateral) los regenera. La intro se muestra una vez por sesión; para volver a verla, abre una pestaña nueva o borra `sessionStorage`.
 
-> ⚠️ El login demo **no es seguro**: las contraseñas están en el código para poder probar la interfaz. Antes de publicar con datos reales, conecta Supabase Auth y aplica `supabase/schema.sql`.
+> ⚠️ El login demo **no es seguro**: las contraseñas están en el código para poder probar la interfaz. Antes de publicar con datos reales, conecta PocketBase (ver abajo).
 
 ## Subir a GitHub
 
@@ -115,14 +119,58 @@ git push -u origin main
 
 1. En <https://vercel.com/new>, importa el repositorio `FernandoMateo/SnapSlide`.
 2. Vercel detecta Next.js automáticamente. No hace falta configurar nada mientras se usen los datos demo.
-3. Al conectar el backend, agrega `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (ver `.env.example`).
+3. Al conectar el backend, agrega `NEXT_PUBLIC_POCKETBASE_URL` con la URL pública de PocketBase.
 
-## Conectar el backend (siguiente fase)
+PocketBase no corre en Vercel: es un único binario con su propia base SQLite y necesita un servidor con disco persistente, como un VPS (Hetzner, DigitalOcean), Fly.io con volumen o PocketHost.
 
-1. Crea un proyecto en Supabase y ejecuta `supabase/schema.sql`.
-2. Cambia el `login` del store por Supabase Auth.
-3. Reemplaza cada acción de `src/lib/store.ts` por la llamada equivalente (la firma de las acciones no cambia, así que la UI no se toca).
-4. Mueve `createSale` a una función SQL transaccional que descuente los lotes en orden FEFO.
+## Backend: PocketBase
+
+### Qué hay en `pocketbase/`
+
+| Pieza | Qué hace |
+|---|---|
+| `pb_migrations/1761600000_snapslide_schema.js` | Crea `products`, `product_costs`, `lots`, `clients`, `sales`, `payments`, `movements` y `expenses`. Extiende `users` con `role`, `monthlyGoal` y `commissionRate`. |
+| API rules | **Visión túnel**: un vendedor solo lista, ve y edita sus propias ventas y cobros. El costo de producción vive en `product_costs`, que solo ven los Owners. No hay registro público. Un vendedor no puede cambiarse el rol, ni la meta, ni los ítems o precios de una orden. |
+| `POST /api/snapslide/sales` | Crea el pedido, valida el stock y descuenta los lotes en orden **FEFO**, todo en una transacción. Si falta stock no se toca nada. |
+| `POST /api/snapslide/movements` | Entradas y salidas de inventario. Solo Owners. |
+| Hook `onRecordUpdate(sales)` | Al pasar una orden a *Pagada* registra el cobro y `paidAt`. Al volver a *Pendiente*, los anula. |
+
+Los errores de las rutas devuelven `{ code }` con la misma clave del diccionario (`sales.noStock`, `inventory.insufficient`…), así la UI los traduce sin mapeos extra.
+
+Esto se probó contra PocketBase v0.40.6 con 25 pruebas de permisos y lógica, y todas pasaron. Entre ellas: visión túnel, FEFO, rollback sin stock, cobro automático e intentos de escalar privilegios.
+
+### Levantarlo en local
+
+1. Descarga PocketBase v0.40.x para tu sistema desde <https://github.com/pocketbase/pocketbase/releases> y deja el ejecutable dentro de `pocketbase/` (el binario y `pb_data/` están en `.gitignore`).
+2. Desde la carpeta `pocketbase/`, crea tu superusuario y arranca el servidor:
+
+   ```bash
+   cd pocketbase
+   ./pocketbase superuser upsert tu@email.com UnaClaveSegura
+   ./pocketbase serve        # aplica las migraciones y carga los hooks automáticamente
+   ```
+
+   El panel de administración queda en <http://127.0.0.1:8090/_/>.
+
+3. *(Opcional, solo desarrollo)* Carga los datos demo, que son los mismos del frontend:
+
+   ```bash
+   # en otra terminal, desde la raíz del proyecto (PowerShell: $env:PB_SUPERUSER_EMAIL="...")
+   PB_SUPERUSER_EMAIL=tu@email.com PB_SUPERUSER_PASSWORD=UnaClaveSegura npm run seed:pb
+   ```
+
+4. Crea `.env.local` con `NEXT_PUBLIC_POCKETBASE_URL=http://127.0.0.1:8090`.
+
+### Pasar el frontend del modo demo a PocketBase
+
+Las reglas de negocio de `src/lib/business.ts` se mantienen. Cambia la fuente de datos del store:
+
+1. `login` / `logout` → `snapApi.login` / `snapApi.logout` (`src/lib/pocketbase.ts`).
+2. Lecturas → `pb.collection("…").getFullList()`. PocketBase ya filtra por rol, así que un vendedor solo recibe sus ventas.
+3. `createSale` → `snapApi.createSale`, `recordMovement` → `snapApi.recordMovement`, `setSaleStatus` → `snapApi.setSaleStatus`.
+4. Productos, clientes y lotes → `pb.collection(...).create/update`. Los Owners leen y escriben el costo en `product_costs`.
+
+En PocketBase las fechas llegan como `2026-10-27 00:00:00.000Z`; usa los primeros 10 caracteres para el formato `yyyy-mm-dd` del frontend.
 
 ## Pendiente de la marca
 

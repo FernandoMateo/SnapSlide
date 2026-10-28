@@ -208,6 +208,8 @@ const en: Dictionary = {
     insufficient: "Not enough stock in that lot.",
     badQty: "Enter a valid quantity.",
     noProduct: "Select a product.",
+    noLot: "Enter the lot code.",
+    badType: "Invalid movement type.",
     done: "Movement recorded.",
     levels: { out: "Out", critical: "Critical", low: "Low", ok: "OK" },
   },
