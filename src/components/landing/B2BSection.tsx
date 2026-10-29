@@ -18,8 +18,10 @@ const NODES = [
 ];
 
 export function B2BSection() {
-  const { d } = useI18n();
+  const { d, locale } = useI18n();
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   return (
     <section id="distribucion" className="relative scroll-mt-20 px-3 py-24 sm:px-6">
@@ -73,14 +75,27 @@ export function B2BSection() {
                 <motion.form
                   key="form"
                   exit={{ opacity: 0, scale: 0.98 }}
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault();
-                    // TODO(backend): enviar a /api/leads y notificar al equipo de ventas.
-                    setSent(true);
+                    if (sending) return;
+                    setSending(true);
+                    setError("");
+                    try {
+                      const body = Object.fromEntries(new FormData(e.currentTarget));
+                      const res = await fetch("/api/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, locale }) });
+                      if (res.ok) setSent(true);
+                      else setError(res.status === 429 ? d.b2b.rateError : d.b2b.sendError);
+                    } catch {
+                      setError(d.b2b.sendError);
+                    } finally {
+                      setSending(false);
+                    }
                   }}
                   className="grid gap-4"
                 >
                   <h3 className="font-display text-2xl font-bold tracking-tight">{d.b2b.formTitle}</h3>
+                  {/* Campo trampa para bots: invisible para personas y lectores de pantalla */}
+                  <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-px w-px opacity-0" />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label={d.b2b.company} name="company" required autoComplete="organization" />
                     <Field label={d.b2b.name} name="name" required autoComplete="name" />
@@ -99,8 +114,13 @@ export function B2BSection() {
                     <label className="label" htmlFor="message">{d.b2b.message}</label>
                     <textarea id="message" name="message" rows={3} className="field resize-none" />
                   </div>
-                  <button type="submit" className="btn btn-primary mt-2 h-13 w-full text-base">
-                    {d.b2b.send}
+                  {error && (
+                    <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm font-semibold text-danger">
+                      {error}
+                    </p>
+                  )}
+                  <button type="submit" disabled={sending} className="btn btn-primary mt-2 h-13 w-full text-base">
+                    {sending ? d.b2b.sending : d.b2b.send}
                   </button>
                 </motion.form>
               )}

@@ -14,6 +14,30 @@ export interface User {
   commissionRate?: number;
 }
 
+/** Embudo de distribuidores: los mismos 3 pasos de la landing, más "descartada". */
+export type LeadStatus = "new" | "contacted" | "active" | "rejected";
+
+/** Solicitud para ser distribuidor. Vive en el servidor (data/leads.json), no en el mock del navegador. */
+export interface Lead {
+  id: string;
+  company: string;
+  name: string;
+  email: string;
+  phone: string;
+  volume: string;
+  message: string;
+  source: "web" | "dashboard";
+  locale: Locale;
+  status: LeadStatus;
+  notes: string;
+  /** Vendedor asignado (id del usuario). */
+  sellerId: string;
+  /** Cliente creado en el sistema al activarlo. */
+  clientId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type ProductType = "sheet" | "liquid";
 
 export interface Lot {

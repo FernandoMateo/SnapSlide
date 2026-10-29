@@ -22,3 +22,6 @@ pocketbase/*.zip
 
 # Generado por Next.js en desarrollo
 AGENTS.md
+
+# Solicitudes de distribuidores (datos reales del servidor)
+/data/

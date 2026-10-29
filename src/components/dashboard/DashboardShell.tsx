@@ -8,6 +8,7 @@ import { Logo } from "@/components/brand/Logo";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/i18n/I18nProvider";
 import { can } from "@/lib/business";
+import { useLeads } from "@/lib/leads";
 import { useCurrentUser, useStore } from "@/lib/store";
 
 const ICON: Record<string, React.ReactNode> = {
@@ -16,6 +17,7 @@ const ICON: Record<string, React.ReactNode> = {
   inventory: <path d="M3 21V8l9-5 9 5v13M7 21v-8h10v8M7 17h10" />,
   sales: <path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-6" />,
   newSale: <path d="M12 5v14M5 12h14" />,
+  leads: <path d="M4 13h4l1.5 3h5L16 13h4M4 13l2.5-7.5A2 2 0 0 1 8.4 4h7.2a2 2 0 0 1 1.9 1.5L20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5Z" />,
   clients: <path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM21 19v-1a4 4 0 0 0-3-3.87M16 3.13a3.5 3.5 0 0 1 0 6.75" />,
 };
 
@@ -27,6 +29,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const user = useCurrentUser();
   const logout = useStore((s) => s.logout);
   const resetDemo = useStore((s) => s.resetDemo);
+  const loadLeads = useLeads((s) => s.load);
+  const newLeads = useLeads((s) => s.leads.filter((l) => l.status === "new").length);
+  const canLeads = can(user, "leads.manage");
+
+  // Contador de solicitudes nuevas en el menú (solo Owner).
+  useEffect(() => {
+    if (canLeads) loadLeads();
+  }, [canLeads, loadLeads]);
 
   useEffect(() => {
     if (hydrated && !user) router.replace("/login");
@@ -48,6 +58,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/sales", key: "sales", label: d.dash.sales },
     { href: "/dashboard/sales/new", key: "newSale", label: d.dash.newSale },
     { href: "/dashboard/clients", key: "clients", label: d.dash.clients },
+    ...(canLeads ? [{ href: "/dashboard/leads", key: "leads", label: d.dash.leads }] : []),
     { href: "/dashboard/products", key: "products", label: d.dash.products },
     ...(can(user, "inventory.manage") ? [{ href: "/dashboard/inventory", key: "inventory", label: d.dash.inventory }] : []),
   ];
@@ -90,6 +101,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   {ICON[item.key]}
                 </svg>
                 <span className="relative">{item.label}</span>
+                {item.key === "leads" && newLeads > 0 && <span className="relative ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-[#3fd0ff] px-1.5 text-[0.65rem] font-extrabold text-[#04121f]">{newLeads}</span>}
               </Link>
             );
           })}
@@ -156,6 +168,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   {ICON[item.key]}
                 </svg>
                 <span className="relative max-w-full truncate px-1">{item.label}</span>
+                {item.key === "leads" && newLeads > 0 && <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#3fd0ff] px-1 text-[0.55rem] font-extrabold text-[#04121f]">{newLeads}</span>}
               </Link>
             );
           })}

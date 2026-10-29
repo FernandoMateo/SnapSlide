@@ -175,9 +175,10 @@ export const useStore = create<AppState>()(
           if (!can(currentUser(), "clients.edit")) return { ok: false, error: "perm.denied" };
           const { clients } = get().db;
           const exists = clients.some((c) => c.id === client.id);
-          const next = exists ? clients.map((c) => (c.id === client.id ? client : c)) : [...clients, { ...client, id: uid("c"), createdAt: today() }];
+          const id = exists ? client.id : uid("c");
+          const next = exists ? clients.map((c) => (c.id === client.id ? client : c)) : [...clients, { ...client, id, createdAt: today() }];
           set({ db: { ...get().db, clients: next } });
-          return { ok: true };
+          return { ok: true, id };
         },
       };
     },

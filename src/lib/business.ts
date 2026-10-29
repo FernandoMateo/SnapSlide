@@ -15,9 +15,11 @@ export type Permission =
   | "inventory.manage"
   | "sales.viewAll"
   | "sales.filterBySeller"
-  | "clients.edit";
+  | "clients.edit"
+  | "leads.manage";
 
 const OWNER_ONLY: Permission[] = [
+  "leads.manage",
   "finance.view",
   "products.edit",
   "products.viewCost",
