@@ -43,6 +43,10 @@ body {
   background: rgb(0 191 255 / 0.25);
 }
 
+/* Campos sin contorno: marcan el foco con su propio borde/anillo celeste */
+.field-bare:focus-visible {
+  outline: none;
+}
 :focus-visible {
   outline: 2px solid var(--color-sky);
   outline-offset: 2px;

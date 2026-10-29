@@ -7,3 +7,5 @@
   (+ Descartadas), tarjetas, detalle con llamar/WhatsApp/correo, asignar vendedor, notas, activar (crea cliente en el store), alta manual.
 - Estado cliente en src/lib/leads.ts (zustand); contador de nuevas en el menú.
 - La clave vive en /var/www/snapslide/.env.production del VPS; el Owner la ingresa una vez por dispositivo.
+
+- 2026-10-28 (tarde): formulario B2B rediseñado como conversación (5 preguntas que se disuelven, panel que se llena de agua, credencial 3D 'Distribuidor oficial' que se completa en vivo y gira al enviar). Clase global `.field-bare` quita el contorno de foco a campos con indicador propio.
