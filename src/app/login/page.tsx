@@ -14,21 +14,29 @@ export default function LoginPage() {
   const { d, t } = useI18n();
   const router = useRouter();
   const login = useStore((s) => s.login);
-  const users = useStore((s) => s.db.users);
+  const bootstrap = useStore((s) => s.bootstrap);
   const user = useCurrentUser();
   const hydrated = useStore((s) => s.hydrated);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
+  // Si ya hay sesión, directo a su espacio: el cliente a su portal, el equipo al sistema.
   useEffect(() => {
-    if (hydrated && user) router.replace("/dashboard");
+    bootstrap();
+  }, [bootstrap]);
+  useEffect(() => {
+    if (hydrated && user) router.replace(user.role === "client" ? "/portal" : "/dashboard");
   }, [hydrated, user, router]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = login(email, password);
-    if (res.ok) router.push("/dashboard");
+    setBusy(true);
+    setError(null);
+    const res = await login(email, password);
+    setBusy(false);
+    if (res.ok) router.push(res.role === "client" ? "/portal" : "/dashboard");
     else setError(t(res.error));
   };
 
@@ -88,35 +96,10 @@ export default function LoginPage() {
                 {error}
               </motion.p>
             )}
-            <button type="submit" className="btn btn-primary mt-2 h-12 text-base">{d.auth.submit}</button>
+            <button type="submit" disabled={busy} className="btn btn-primary mt-2 h-12 text-base">{d.auth.submit}</button>
           </form>
 
-          <div className="mt-10">
-            <p className="label">{d.auth.demoUsers}</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {users.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => {
-                    setEmail(u.email);
-                    setPassword(u.password);
-                    setError(null);
-                  }}
-                  className="flex items-center gap-3 rounded-2xl border border-line bg-white px-3 py-2.5 text-left transition-colors hover:border-sky"
-                >
-                  <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-extrabold ${u.role === "owner" ? "bg-ink text-white" : "bg-sky-soft text-sky-deep"}`}>
-                    {u.name[0]}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-ink">{u.name}</span>
-                    <span className="block text-xs text-ink-faint">{u.role === "owner" ? d.auth.owner : d.auth.seller}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-            <p className="mt-4 text-xs text-ink-faint">{d.auth.demoNote}</p>
-          </div>
+          <p className="mt-8 text-sm text-ink-soft">{d.auth.help}</p>
         </div>
       </main>
     </div>

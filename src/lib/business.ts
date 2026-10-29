@@ -16,9 +16,11 @@ export type Permission =
   | "sales.viewAll"
   | "sales.filterBySeller"
   | "clients.edit"
-  | "leads.manage";
+  | "leads.manage"
+  | "users.manage";
 
 const OWNER_ONLY: Permission[] = [
+  "users.manage",
   "leads.manage",
   "finance.view",
   "products.edit",
@@ -30,13 +32,16 @@ const OWNER_ONLY: Permission[] = [
 ];
 
 export function can(user: User | null | undefined, permission: Permission): boolean {
-  if (!user) return false;
+  if (!user || user.active === false) return false;
   if (user.role === "owner") return true;
+  // Los clientes no son personal: ningún permiso del sistema interno.
+  if (user.role === "client") return false;
   return !OWNER_ONLY.includes(permission);
 }
 
-/** "Visión túnel": un vendedor solo ve sus propias ventas. */
+/** "Visión túnel": un vendedor solo ve sus propias ventas; un cliente, solo las suyas. */
 export function visibleSales(user: User, sales: Sale[]): Sale[] {
+  if (user.role === "client") return sales.filter((s) => s.clientId === user.clientId);
   return can(user, "sales.viewAll") ? sales : sales.filter((s) => s.sellerId === user.id);
 }
 

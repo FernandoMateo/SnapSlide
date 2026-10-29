@@ -1,17 +1,37 @@
-export type Role = "owner" | "seller";
+/** owner = administrador · seller = vendedor · client = cliente con acceso al portal de pedidos. */
+export type Role = "owner" | "seller" | "client";
 export type Locale = "es" | "en";
 
+/** Usuario visible en la app. La contraseña nunca sale del servidor (vive aparte, cifrada). */
 export interface User {
   id: string;
   name: string;
   email: string;
-  /** Solo para el modo demo. En producción la autenticación vive en el backend. */
-  password: string;
   role: Role;
+  phone?: string;
+  /** Zona o territorio del vendedor. */
+  zone?: string;
+  /** Desactivado: no puede iniciar sesión, pero su historial se conserva. */
+  active?: boolean;
+  /** Cliente al que pertenece (solo rol client). */
+  clientId?: string;
+  /** Debe cambiar la contraseña temporal en su próximo inicio de sesión. */
+  mustChangePassword?: boolean;
+  createdAt?: string;
   /** Meta de ventas mensual en USD (solo vendedores). */
   monthlyGoal?: number;
   /** Comisión sobre ventas, 0.08 = 8% (solo vendedores). */
   commissionRate?: number;
+}
+
+export interface Database {
+  users: User[];
+  products: Product[];
+  clients: Client[];
+  sales: Sale[];
+  payments: Payment[];
+  movements: Movement[];
+  expenses: Expense[];
 }
 
 /** Embudo de distribuidores: los mismos 3 pasos de la landing, más "descartada". */
@@ -99,6 +119,8 @@ export interface Sale {
   status: SaleStatus;
   paidAt?: string;
   notes?: string;
+  /** "portal" si lo cargó el propio cliente. */
+  channel?: "portal";
 }
 
 export type PaymentMethod = "transfer" | "check" | "card" | "cash";

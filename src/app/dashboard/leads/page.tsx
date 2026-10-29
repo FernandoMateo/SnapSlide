@@ -280,7 +280,7 @@ function LeadDetail({ lead, onDeleted }: { lead: Lead; onDeleted: () => void }) 
   const activate = async () => {
     let clientId = lead.clientId;
     if (makeClient && !clientId) {
-      const res = saveClient({
+      const res = await saveClient({
         id: "",
         company: lead.company,
         contact: lead.name,

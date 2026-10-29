@@ -5,7 +5,9 @@
  */
 // Import relativo con extensión: este archivo también lo ejecuta Node directo (scripts/seed-pocketbase.mts).
 import { addDays, today } from "../lib/dates.ts";
-import type { Client, Expense, Movement, Payment, PaymentMethod, Product, Sale, SaleItem, User } from "@/lib/types";
+import type { Client, Database, Expense, Movement, Payment, PaymentMethod, Product, Sale, SaleItem, User } from "@/lib/types";
+
+export type { Database };
 
 function mulberry32(seed: number) {
   return () => {
@@ -17,14 +19,22 @@ function mulberry32(seed: number) {
   };
 }
 
+/** Contraseñas de los usuarios demo: solo para desarrollo local (en el VPS se usa SEED_PASSWORD). */
+export const mockPasswords: Record<string, string> = {
+  "u-avril": "snap2026",
+  "u-chris": "snap2026",
+  "u-daniela": "ventas2026",
+  "u-marco": "ventas2026",
+  "u-jessica": "ventas2026",
+};
+
 export const mockUsers: User[] = [
-  { id: "u-avril", name: "Avril", email: "avril@snapslide.com", password: "snap2026", role: "owner" },
-  { id: "u-chris", name: "Chris", email: "chris@snapslide.com", password: "snap2026", role: "owner" },
+  { id: "u-avril", name: "Avril", email: "avril@snapslide.com", role: "owner" },
+  { id: "u-chris", name: "Chris", email: "chris@snapslide.com", role: "owner" },
   {
     id: "u-daniela",
     name: "Daniela Ruiz",
     email: "daniela@snapslide.com",
-    password: "ventas2026",
     role: "seller",
     monthlyGoal: 45000,
     commissionRate: 0.08,
@@ -33,7 +43,6 @@ export const mockUsers: User[] = [
     id: "u-marco",
     name: "Marco Silva",
     email: "marco@snapslide.com",
-    password: "ventas2026",
     role: "seller",
     monthlyGoal: 55000,
     commissionRate: 0.07,
@@ -42,7 +51,6 @@ export const mockUsers: User[] = [
     id: "u-jessica",
     name: "Jessica Moore",
     email: "jessica@snapslide.com",
-    password: "ventas2026",
     role: "seller",
     monthlyGoal: 34000,
     commissionRate: 0.075,
@@ -242,16 +250,6 @@ function buildMovements(products: Product[]): Movement[] {
     })),
     )
     .sort((a, b) => b.date.localeCompare(a.date));
-}
-
-export interface Database {
-  users: User[];
-  products: Product[];
-  clients: Client[];
-  sales: Sale[];
-  payments: Payment[];
-  movements: Movement[];
-  expenses: Expense[];
 }
 
 export function createMockDatabase(): Database {

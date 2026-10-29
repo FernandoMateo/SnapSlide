@@ -111,9 +111,9 @@ function ProductForm({ initial, canEdit, showCost, onDone }: { initial: Product;
   const set = <K extends keyof Product>(k: K, v: Product[K]) => setP((prev) => ({ ...prev, [k]: v }));
   const setLot = (i: number, patch: Partial<Lot>) => set("lots", p.lots.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = saveProduct({ ...p, id: p.id || `p-${p.sku.toLowerCase().replace(/[^a-z0-9]+/g, "-")}` });
+    const res = await saveProduct({ ...p, id: p.id || `p-${p.sku.toLowerCase().replace(/[^a-z0-9]+/g, "-")}` });
     if (res.ok) onDone();
     else setError(t(res.error));
   };

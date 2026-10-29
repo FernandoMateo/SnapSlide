@@ -6,7 +6,7 @@
  * Solo para desarrollo: crea usuarios con las contraseñas demo. No lo ejecutes contra producción.
  */
 import PocketBase from "pocketbase";
-import { createMockDatabase } from "../src/mocks/index.ts";
+import { createMockDatabase, mockPasswords } from "../src/mocks/index.ts";
 
 const url = process.env.PB_URL ?? "http://127.0.0.1:8090";
 const email = process.env.PB_SUPERUSER_EMAIL;
@@ -33,8 +33,8 @@ const ids = new Map<string, string>(); // id del mock → id de PocketBase
 for (const u of db.users) {
   const rec = await pb.collection("users").create({
     email: u.email,
-    password: u.password,
-    passwordConfirm: u.password,
+    password: mockPasswords[u.id],
+    passwordConfirm: mockPasswords[u.id],
     name: u.name,
     role: u.role,
     monthlyGoal: u.monthlyGoal ?? 0,

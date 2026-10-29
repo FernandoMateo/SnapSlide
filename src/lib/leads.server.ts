@@ -8,7 +8,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { Lead, LeadStatus, Locale } from "./types";
 
-const FILE = process.env.LEADS_FILE || join(process.cwd(), "data", "leads.json");
+const FILE = process.env.LEADS_FILE || join(/* turbopackIgnore: true */ process.cwd(), "data", "leads.json");
 
 async function readAll(): Promise<Lead[]> {
   try {
@@ -122,8 +122,8 @@ export function checkKey(req: Request): "ok" | "missing" | "denied" {
 
 /** Límite simple por IP para el formulario público (en memoria: se reinicia con el proceso). */
 const hits = new Map<string, number[]>();
-export function rateLimited(req: Request, max = 5, windowMs = 10 * 60_000): boolean {
-  const ip = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
+export function rateLimited(req: Request, max = 5, windowMs = 10 * 60_000, bucket = "leads"): boolean {
+  const ip = `${bucket}:${req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local"}`;
   const now = Date.now();
   const recent = (hits.get(ip) || []).filter((t) => now - t < windowMs);
   recent.push(now);

@@ -51,7 +51,7 @@ export const useLeads = create<LeadsState>()((set, get) => {
     badKey: false,
 
     async load() {
-      if (!readKey()) return set({ status: "locked", badKey: false });
+      // Con sesión de administrador el servidor responde sin clave; la clave queda como respaldo.
       if (get().status !== "ready") set({ status: "loading" });
       try {
         const res = await call("/api/leads");

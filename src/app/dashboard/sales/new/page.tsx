@@ -41,10 +41,10 @@ export default function NewSalePage() {
     });
   };
 
-  const confirm = () => {
+  const confirm = async () => {
     setError(null);
     if (!clientId) return setError(d.sales.noClient);
-    const res = createSale({ clientId, items: cart, notes: notes || undefined });
+    const res = await createSale({ clientId, items: cart, notes: notes || undefined });
     if (res.ok) {
       setCreated(res.id ?? "");
       setCart([]);

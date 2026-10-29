@@ -87,7 +87,10 @@ export default function SalesPage() {
           const overdue = s.status === "pending" && s.dueDate < today();
           return (
             <tr key={s.id} className="hover:bg-sky-soft/30">
-              <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-bold">{s.number}</td>
+              <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-bold">
+                {s.number}
+                {s.channel === "portal" && <span className="ml-1.5 rounded-full bg-sky-soft px-1.5 py-0.5 font-sans text-[0.6rem] font-extrabold text-sky-deep">{d.portal.viaPortal}</span>}
+              </td>
               <td className="whitespace-nowrap px-4 py-3 text-ink-soft">{date(s.date)}</td>
               <td className="px-4 py-3 font-semibold">{clientName(s.clientId)}</td>
               {isOwner && <td className="px-4 py-3 text-ink-soft">{db.users.find((u) => u.id === s.sellerId)?.name}</td>}

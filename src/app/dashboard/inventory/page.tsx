@@ -3,16 +3,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { EmptyRow, Notice, PageHeader, Table } from "@/components/dashboard/ui";
+import { LabelDialog, type LabelData } from "@/components/inventory/LotLabel";
+import { labelFor } from "@/components/inventory/labelFor";
+import { ScanBox } from "@/components/inventory/ScanBox";
 import { useI18n } from "@/i18n/I18nProvider";
 import { can, lotsFEFO, productStock, stockLevel } from "@/lib/business";
 import { daysBetween, today } from "@/lib/dates";
 import { useCurrentUser, useStore } from "@/lib/store";
 import type { MovementReason, Product } from "@/lib/types";
 
+
 export default function InventoryPage() {
   const { d } = useI18n();
   const user = useCurrentUser()!;
   const products = useStore((s) => s.db.products);
+  const [label, setLabel] = useState<LabelData | null>(null);
 
   if (!can(user, "inventory.manage")) return <Notice kind="error">{d.perm.denied}</Notice>;
 
@@ -24,6 +29,8 @@ export default function InventoryPage() {
     <>
       <PageHeader title={d.inventory.title} subtitle={d.inventory.subtitle} />
 
+      <ScanBox onLabel={setLabel} />
+
       <h2 className="label">{d.inventory.monitor}</h2>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {sorted.map((p, i) => (
@@ -32,11 +39,12 @@ export default function InventoryPage() {
       </div>
 
       <div className="mt-10 grid gap-4 lg:grid-cols-2">
-        <MovementForm type="in" />
-        <MovementForm type="out" />
+        <MovementForm type="in" onLabel={setLabel} />
+        <MovementForm type="out" onLabel={setLabel} />
       </div>
 
-      <MovementHistory />
+      <MovementHistory onLabel={setLabel} />
+      <LabelDialog data={label} onClose={() => setLabel(null)} />
     </>
   );
 }
@@ -97,9 +105,12 @@ function StockTile({ product, index }: { product: Product; index: number }) {
 const IN_REASONS: MovementReason[] = ["production", "purchase", "adjustment"];
 const OUT_REASONS: MovementReason[] = ["waste", "damage", "expired", "adjustment"];
 
-function MovementForm({ type }: { type: "in" | "out" }) {
+function MovementForm({ type, onLabel }: { type: "in" | "out"; onLabel: (l: LabelData) => void }) {
   const { d, t, num, date } = useI18n();
-  const products = useStore((s) => s.db.products);
+  const db = useStore((s) => s.db);
+  const me = useCurrentUser()!;
+  const products = db.products;
+  const [printable, setPrintable] = useState<LabelData | null>(null);
   const recordMovement = useStore((s) => s.recordMovement);
   const [productId, setProductId] = useState(products[0]?.id ?? "");
   const [lotCode, setLotCode] = useState("");
@@ -111,12 +122,19 @@ function MovementForm({ type }: { type: "in" | "out" }) {
   const product = products.find((p) => p.id === productId);
   const lots = product ? lotsFEFO(product) : [];
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = type === "out" ? lotCode || lots[0]?.code || "" : lotCode.trim().toUpperCase();
-    const res = recordMovement({ productId, type, reason, quantity: Number(quantity), lotCode: code, expiresAt: expiresAt || undefined, note: note || undefined });
+    const res = await recordMovement({ productId, type, reason, quantity: Number(quantity), lotCode: code, expiresAt: expiresAt || undefined, note: note || undefined });
     if (res.ok) {
       setMsg({ kind: "success", text: d.inventory.done });
+      if (type === "in") {
+        // Etiqueta con lo recién ingresado (el lote ya existe con su vencimiento).
+        const fresh = useStore.getState().db;
+        const data = labelFor(fresh, { productId, lotCode: code, quantity: Number(quantity), date: today(), reason, userId: me.id, note: note || undefined }, d.inventory.reasons[reason]);
+        setPrintable(data);
+        if (data) onLabel(data);
+      }
       setQuantity("");
       setNote("");
       if (type === "in") setLotCode("");
@@ -183,6 +201,11 @@ function MovementForm({ type }: { type: "in" | "out" }) {
       </div>
 
       <AnimatePresence>{msg && <Notice kind={msg.kind}>{msg.text}</Notice>}</AnimatePresence>
+      {type === "in" && printable && msg?.kind === "success" && (
+        <button type="button" onClick={() => onLabel(printable)} className="btn btn-ghost -mt-1 h-11 text-sm">
+          🏷 {d.inventory.printLabel} · {printable.lotCode}
+        </button>
+      )}
 
       <button type="submit" disabled={type === "out" && lots.length === 0} className={`btn ${type === "in" ? "btn-primary" : "btn-dark"}`}>
         {d.inventory.register} · {type === "in" ? d.inventory.movementIn : d.inventory.movementOut}
@@ -191,15 +214,16 @@ function MovementForm({ type }: { type: "in" | "out" }) {
   );
 }
 
-function MovementHistory() {
+function MovementHistory({ onLabel }: { onLabel: (l: LabelData) => void }) {
   const { d, num, date } = useI18n();
-  const { movements, products, users } = useStore((s) => s.db);
+  const db = useStore((s) => s.db);
+  const { movements, products, users } = db;
   const recent = movements.slice(0, 15);
   return (
     <section className="mt-10">
       <h2 className="label">{d.inventory.history}</h2>
-      <Table head={[d.common.date, d.inventory.product, d.inventory.lot, d.inventory.reason, d.common.quantity, d.inventory.user]}>
-        {recent.length === 0 && <EmptyRow colSpan={6} label={d.common.none} />}
+      <Table head={[d.common.date, d.inventory.product, d.inventory.lot, d.inventory.reason, d.common.quantity, d.inventory.user, d.inventory.label]}>
+        {recent.length === 0 && <EmptyRow colSpan={7} label={d.common.none} />}
         {recent.map((m) => (
           <tr key={m.id}>
             <td className="px-4 py-3 text-ink-soft">{date(m.date)}</td>
@@ -211,6 +235,19 @@ function MovementHistory() {
               {num(m.quantity)}
             </td>
             <td className="px-4 py-3 text-ink-soft">{users.find((u) => u.id === m.userId)?.name}</td>
+            <td className="px-4 py-3">
+              {m.type === "in" && (
+                <button
+                  onClick={() => {
+                    const data = labelFor(db, m, d.inventory.reasons[m.reason]);
+                    if (data) onLabel(data);
+                  }}
+                  className="rounded-full bg-sky-soft px-3 py-1.5 text-xs font-bold text-sky-deep hover:bg-sky hover:text-white"
+                >
+                  🏷 {d.inventory.label}
+                </button>
+              )}
+            </td>
           </tr>
         ))}
       </Table>

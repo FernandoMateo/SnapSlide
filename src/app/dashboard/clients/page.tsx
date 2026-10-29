@@ -195,9 +195,9 @@ function ClientForm({ initial, onDone }: { initial: Client; onDone: () => void }
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        const res = saveClient(c);
+        const res = await saveClient(c);
         if (res.ok) onDone();
         else setError(t(res.error));
       }}

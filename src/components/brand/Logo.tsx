@@ -5,7 +5,7 @@
 interface LogoProps {
   className?: string;
   /** "dark" sobre fondos claros, "light" sobre fondos de color. */
-  tone?: "dark" | "light";
+  tone?: Tone;
   /** Se mantiene por compatibilidad: el logo oficial ya incluye el nombre. */
   showWordmark?: boolean;
 }
@@ -14,14 +14,18 @@ const FILL = {
   // Celeste oscuro → celeste claro
   dark: "linear-gradient(115deg, #035e94 0%, #0096d6 45%, #3fd0ff 100%)",
   light: "#ffffff",
+  // Negro puro para impresoras térmicas (etiquetas).
+  black: "#000000",
 };
 
-function maskStyle(tone: "dark" | "light"): React.CSSProperties {
+type Tone = keyof typeof FILL;
+
+function maskStyle(tone: Tone): React.CSSProperties {
   const mask = "url(/brand/logo.png) center / contain no-repeat";
   return { background: FILL[tone], mask, WebkitMask: mask };
 }
 
-export function LogoMark({ className = "h-8 w-8", tone = "dark" }: { className?: string; tone?: "dark" | "light" }) {
+export function LogoMark({ className = "h-8 w-8", tone = "dark" }: { className?: string; tone?: Tone }) {
   return <span aria-hidden="true" className={`inline-block ${className}`} style={maskStyle(tone)} />;
 }
 

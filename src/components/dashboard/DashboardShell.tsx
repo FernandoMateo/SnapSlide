@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { ForcePasswordChange } from "@/components/account/ForcePasswordChange";
 import { useI18n } from "@/i18n/I18nProvider";
 import { can } from "@/lib/business";
 import { useLeads } from "@/lib/leads";
@@ -17,6 +18,7 @@ const ICON: Record<string, React.ReactNode> = {
   inventory: <path d="M3 21V8l9-5 9 5v13M7 21v-8h10v8M7 17h10" />,
   sales: <path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-6" />,
   newSale: <path d="M12 5v14M5 12h14" />,
+  team: <path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-3A3.5 3.5 0 0 0 7 18.5V20M12 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM20.5 18v-1a3 3 0 0 0-2.2-2.9M17.5 5.2a3 3 0 0 1 0 5.6M3.5 18v-1a3 3 0 0 1 2.2-2.9M6.5 5.2a3 3 0 0 0 0 5.6" />,
   leads: <path d="M4 13h4l1.5 3h5L16 13h4M4 13l2.5-7.5A2 2 0 0 1 8.4 4h7.2a2 2 0 0 1 1.9 1.5L20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5Z" />,
   clients: <path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM21 19v-1a4 4 0 0 0-3-3.87M16 3.13a3.5 3.5 0 0 1 0 6.75" />,
 };
@@ -28,10 +30,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const hydrated = useStore((s) => s.hydrated);
   const user = useCurrentUser();
   const logout = useStore((s) => s.logout);
-  const resetDemo = useStore((s) => s.resetDemo);
+  const bootstrap = useStore((s) => s.bootstrap);
   const loadLeads = useLeads((s) => s.load);
   const newLeads = useLeads((s) => s.leads.filter((l) => l.status === "new").length);
   const canLeads = can(user, "leads.manage");
+
+  // Datos del servidor al entrar y al volver a la pestaña (otros usuarios pudieron cambiar algo).
+  useEffect(() => {
+    bootstrap();
+    const onFocus = () => bootstrap(true);
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [bootstrap]);
 
   // Contador de solicitudes nuevas en el menú (solo Owner).
   useEffect(() => {
@@ -39,10 +49,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [canLeads, loadLeads]);
 
   useEffect(() => {
-    if (hydrated && !user) router.replace("/login");
+    if (!hydrated) return;
+    if (!user) router.replace("/login");
+    else if (user.role === "client") router.replace("/portal");
   }, [hydrated, user, router]);
 
-  if (!hydrated || !user) {
+  if (!hydrated || !user || user.role === "client") {
     return (
       <div className="grid min-h-[100svh] place-items-center">
         <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.4, repeat: Infinity }} className="flex items-center gap-3 text-sm font-semibold text-ink-soft">
@@ -61,14 +73,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     ...(canLeads ? [{ href: "/dashboard/leads", key: "leads", label: d.dash.leads }] : []),
     { href: "/dashboard/products", key: "products", label: d.dash.products },
     ...(can(user, "inventory.manage") ? [{ href: "/dashboard/inventory", key: "inventory", label: d.dash.inventory }] : []),
+    ...(can(user, "users.manage") ? [{ href: "/dashboard/team", key: "team", label: d.dash.team }] : []),
   ];
 
   // "Inicio" y "Ventas" son prefijos de otras rutas: solo se marcan con coincidencia exacta.
   const isActive = (href: string) => (href === "/dashboard" || href === "/dashboard/sales" ? pathname === href : pathname.startsWith(href));
 
   const roleLabel = user.role === "owner" ? d.dash.roleOwner : d.dash.roleSeller;
-  const signOut = () => {
-    logout();
+  const signOut = async () => {
+    await logout();
     router.push("/login");
   };
 
@@ -108,15 +121,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="relative mt-auto grid gap-2">
-          <button onClick={() => window.confirm(d.dash.resetConfirm) && resetDemo()} className="rounded-xl px-3 py-2 text-left text-xs font-semibold text-white/40 transition-colors hover:bg-white/5 hover:text-white">
-            ↺ {d.dash.resetDemo}
-          </button>
-          <div className="flex items-center gap-3 rounded-2xl bg-white/[0.06] p-3 ring-1 ring-white/10">
-            <Avatar name={user.name} owner={user.role === "owner"} />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-bold">{user.name}</span>
-              <span className="block truncate text-xs text-white/50">{roleLabel}</span>
-            </span>
+          <div className={`flex items-center gap-3 rounded-2xl p-3 ring-1 transition-colors ${pathname.startsWith("/dashboard/profile") ? "bg-white/[0.12] ring-[#3fd0ff]/50" : "bg-white/[0.06] ring-white/10"}`}>
+            <Link href="/dashboard/profile" title={d.dash.profile} className="flex min-w-0 flex-1 items-center gap-3">
+              <Avatar name={user.name} owner={user.role === "owner"} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-bold">{user.name}</span>
+                <span className="block truncate text-xs text-white/50">{d.dash.profile} · {roleLabel}</span>
+              </span>
+            </Link>
             <button onClick={signOut} aria-label={d.dash.logout} title={d.dash.logout} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white/50 transition-colors hover:bg-white/10 hover:text-white">
               <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
@@ -138,9 +150,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <LanguageToggle />
             <span className={`hidden rounded-full px-3 py-1.5 text-xs font-bold sm:inline ${user.role === "owner" ? "bg-ink text-white" : "bg-sky-soft text-sky-deep"}`}>{roleLabel}</span>
-            <span className="lg:hidden">
+            <Link href="/dashboard/profile" aria-label={d.dash.profile} className="lg:hidden">
               <Avatar name={user.name} owner={user.role === "owner"} small />
-            </span>
+            </Link>
             <button onClick={signOut} aria-label={d.dash.logout} className="grid h-9 w-9 place-items-center rounded-full bg-white text-ink-soft ring-1 ring-line lg:hidden">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
@@ -156,13 +168,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
+      {user.mustChangePassword && <ForcePasswordChange />}
+
       {/* Navegación inferior móvil: barra flotante */}
       <nav className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 rounded-[24px] bg-[#04121f]/92 p-1.5 shadow-[0_20px_40px_-16px_rgba(3,16,31,0.7)] backdrop-blur-xl lg:hidden">
-        <div className="grid" style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}>
+        <div className="no-scrollbar flex overflow-x-auto">
           {nav.map((item) => {
             const active = isActive(item.href);
             return (
-              <Link key={item.href} href={item.href} className={`relative flex h-14 flex-col items-center justify-center gap-1 rounded-[18px] text-[0.6rem] font-bold ${active ? "text-white" : "text-white/50"}`}>
+              <Link key={item.href} href={item.href} className={`relative flex h-14 min-w-[60px] flex-1 shrink-0 flex-col items-center justify-center gap-1 rounded-[18px] text-[0.6rem] font-bold ${active ? "text-white" : "text-white/50"}`}>
                 {active && <motion.span layoutId="nav-active-m" className="absolute inset-0 rounded-[18px] bg-gradient-to-b from-[#0096d6] to-[#3fd0ff]" transition={{ type: "spring", duration: 0.4, bounce: 0.15 }} />}
                 <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   {ICON[item.key]}
