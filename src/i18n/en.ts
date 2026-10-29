@@ -72,6 +72,29 @@ const en: Dictionary = {
     fullscreen: "Full screen",
     back: "Back to home",
   },
+  steps: {
+    kicker: "Become a distributor",
+    title: "Three steps. Zero hassle.",
+    cta: "I want to distribute",
+    stepLabel: "Step",
+    items: [
+      { title: "Send your request", text: "Tell us about your business in the distribution form. Just the basics." },
+      { title: "Get your wholesale price", text: "A dedicated sales rep reaches out with volume pricing and answers your questions." },
+      { title: "Start selling", text: "Place your order, receive the stock from Miami and bring Snap Slide to your customers." },
+    ],
+    phone: {
+      company: "Your company",
+      volume: "Monthly volume",
+      send: "Send request",
+      approved: "Request approved!",
+      seller: "Your sales rep",
+      price: "Wholesale price",
+      perBox: "per box",
+      order: "Order",
+      delivered: "Delivered",
+      sales: "Your sales",
+    },
+  },
   b2b: {
     kicker: "B2B distribution",
     title: "We distribute across the Miami region.",
@@ -122,6 +145,7 @@ const en: Dictionary = {
     roleOwner: "Owner · Full access",
     roleSeller: "Sales rep",
     greeting: "Hi",
+    menu: "Menu",
     loading: "Loading system…",
   },
   home: {

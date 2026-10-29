@@ -70,6 +70,29 @@ const es = {
     fullscreen: "Pantalla completa",
     back: "Volver al inicio",
   },
+  steps: {
+    kicker: "Hazte distribuidor",
+    title: "Tres pasos. Cero vueltas.",
+    cta: "Quiero ser distribuidor",
+    stepLabel: "Paso",
+    items: [
+      { title: "Envía tu solicitud", text: "Cuéntanos de tu negocio en el formulario de distribución. Solo datos básicos." },
+      { title: "Recibe tu precio mayorista", text: "Un vendedor dedicado te contacta con precios por volumen y resuelve tus dudas." },
+      { title: "Empieza a vender", text: "Haz tu pedido, recibe la mercancía desde Miami y lleva Snap Slide a tus clientes." },
+    ],
+    phone: {
+      company: "Tu empresa",
+      volume: "Volumen mensual",
+      send: "Enviar solicitud",
+      approved: "¡Solicitud aprobada!",
+      seller: "Tu vendedor",
+      price: "Precio mayorista",
+      perBox: "por caja",
+      order: "Pedido",
+      delivered: "Entregado",
+      sales: "Tus ventas",
+    },
+  },
   b2b: {
     kicker: "Distribución B2B",
     title: "Distribuimos en toda la región de Miami.",
@@ -120,6 +143,7 @@ const es = {
     roleOwner: "Owner · Acceso total",
     roleSeller: "Vendedor",
     greeting: "Hola",
+    menu: "Menú",
     loading: "Cargando sistema…",
   },
   home: {

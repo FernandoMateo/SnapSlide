@@ -84,7 +84,7 @@ export function SmoothLineChart({
         <svg width={width} height={height} className="overflow-visible">
           <defs>
             <linearGradient id="line-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#00BFFF" stopOpacity="0.28" />
+              <stop offset="0" stopColor="#0096D6" stopOpacity="0.3" />
               <stop offset="1" stopColor="#00BFFF" stopOpacity="0" />
             </linearGradient>
           </defs>

@@ -11,7 +11,8 @@ interface LogoProps {
 }
 
 const FILL = {
-  dark: "linear-gradient(115deg, #0b1b2b 30%, #0a3fbf 68%, #00bfff 100%)",
+  // Celeste oscuro → celeste claro
+  dark: "linear-gradient(115deg, #035e94 0%, #0096d6 45%, #3fd0ff 100%)",
   light: "#ffffff",
 };
 

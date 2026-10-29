@@ -141,7 +141,7 @@ function ClientStatement({ client, onEdit }: { client: Client; onEdit?: () => vo
             const late = daysBetween(s.dueDate, t);
             return (
               <tr key={s.id}>
-                <td className="px-4 py-3 font-mono text-xs font-bold">{s.number}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-bold">{s.number}</td>
                 <td className="px-4 py-3 text-ink-soft">{date(s.date)}</td>
                 <td className={`px-4 py-3 ${late > 0 ? "font-bold text-danger" : "text-ink-soft"}`}>
                   {date(s.dueDate)}

@@ -9,6 +9,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
+        <span aria-hidden className="mb-4 block h-1.5 w-12 rounded-full bg-gradient-to-r from-[#035e94] via-[#0096d6] to-[#3fd0ff]" />
         <h1 className="font-display text-[clamp(1.9rem,3.6vw,2.8rem)] font-extrabold leading-none tracking-[-0.035em] text-ink">{title}</h1>
         {subtitle && <p className="mt-2 text-ink-soft">{subtitle}</p>}
       </div>
@@ -105,7 +106,7 @@ export function SearchInput({ value, onChange, placeholder }: { value: string; o
 
 export function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
   return (
-    <div className="inline-flex rounded-full bg-mist p-1 ring-1 ring-line">
+    <div className="inline-flex rounded-full bg-white/80 p-1 shadow-[0_8px_20px_-14px_rgba(3,94,148,0.45)] ring-1 ring-line">
       {options.map((o) => (
         <button
           key={o.value}
@@ -113,7 +114,7 @@ export function Segmented<T extends string>({ value, onChange, options }: { valu
           aria-pressed={o.value === value}
           className={`relative h-9 rounded-full px-4 text-sm font-bold transition-colors ${o.value === value ? "text-white" : "text-ink-soft hover:text-ink"}`}
         >
-          {o.value === value && <motion.span layoutId={`seg-${options.map((x) => x.value).join("")}`} className="absolute inset-0 -z-0 rounded-full bg-ink" transition={{ type: "spring", duration: 0.35, bounce: 0.15 }} />}
+          {o.value === value && <motion.span layoutId={`seg-${options.map((x) => x.value).join("")}`} className="absolute inset-0 -z-0 rounded-full bg-gradient-to-r from-[#035e94] to-[#0096d6] shadow-[0_6px_16px_-6px_rgba(0,150,214,0.7)]" transition={{ type: "spring", duration: 0.35, bounce: 0.15 }} />}
           <span className="relative">{o.label}</span>
         </button>
       ))}
@@ -137,7 +138,7 @@ export function Table({ head, children }: { head: React.ReactNode[]; children: R
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="bg-mist/70 text-[0.7rem] font-bold uppercase tracking-[0.08em] text-ink-faint">
+          <thead className="bg-[#eef6fb] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-ink-faint">
             <tr>
               {head.map((h, i) => (
                 <th key={i} className="whitespace-nowrap px-4 py-3">

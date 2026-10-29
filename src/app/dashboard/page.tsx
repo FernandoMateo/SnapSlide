@@ -82,14 +82,15 @@ function OwnerHome() {
 
       <div className="grid gap-4 lg:grid-cols-12">
         {/* Ingresos: la tarjeta protagonista */}
-        <motion.section {...rise(0)} className="card relative overflow-hidden p-7 lg:col-span-7 lg:row-span-2 lg:p-9">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-sky/15 blur-3xl" />
-          <p className="label">{d.home.income}</p>
-          <p className="tabular mt-3 font-display text-[clamp(2.8rem,6vw,5.2rem)] font-extrabold leading-none tracking-[-0.04em] text-ink">{money(fin.income)}</p>
-          <p className="mt-3 text-sm text-ink-soft">
-            <span className="font-bold text-ok">{Math.round(fin.margin * 100)}%</span> {d.home.margin}
+        <motion.section {...rise(0)} className="relative overflow-hidden rounded-[24px] p-7 text-white shadow-[0_30px_60px_-30px_rgba(0,120,190,0.8)] lg:col-span-7 lg:row-span-2 lg:p-9" style={{ background: "linear-gradient(135deg, #035e94 0%, #0096d6 55%, #3fd0ff 100%)" }}>
+          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-white/25 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 -left-10 h-72 w-72 rounded-full bg-[#03101f]/25 blur-3xl" />
+          <p className="label relative !text-white/70">{d.home.income}</p>
+          <p className="tabular relative mt-3 font-display text-[clamp(2.8rem,6vw,5.2rem)] font-extrabold leading-none tracking-[-0.04em]">{money(fin.income)}</p>
+          <p className="relative mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-sm ring-1 ring-white/25 backdrop-blur">
+            <span className="font-bold">{Math.round(fin.margin * 100)}%</span> {d.home.margin}
           </p>
-          <Sparkline values={weekly("income")} className="mt-10 h-28 w-full lg:h-40" />
+          <Sparkline values={weekly("income")} color="#ffffff" className="relative mt-10 h-28 w-full lg:h-40" />
         </motion.section>
 
         <motion.section {...rise(1)} className="card p-7 lg:col-span-5">
@@ -98,12 +99,12 @@ function OwnerHome() {
           <Sparkline values={weekly("expenses")} color="#FF9F1C" className="mt-5 h-12 w-full" />
         </motion.section>
 
-        <motion.section {...rise(2)} className="relative overflow-hidden rounded-[22px] bg-ink p-7 text-white lg:col-span-5">
+        <motion.section {...rise(2)} className="relative overflow-hidden rounded-[24px] p-7 text-white lg:col-span-5" style={{ background: "linear-gradient(160deg, #06203a 0%, #04121f 100%)" }}>
           <div className="pointer-events-none absolute -bottom-16 -right-10 h-48 w-48 rounded-full bg-sky/40 blur-3xl" />
           <p className="label !text-white/60">{d.home.net}</p>
           <p className={`tabular mt-3 font-display text-4xl font-extrabold tracking-[-0.03em] ${fin.net < 0 ? "text-danger" : "text-white"}`}>{money(fin.net)}</p>
           <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-            <motion.div className="h-full rounded-full bg-sky" initial={{ width: 0 }} animate={{ width: `${Math.max(0, Math.min(100, fin.margin * 100))}%` }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
+            <motion.div className="h-full rounded-full bg-gradient-to-r from-[#0096d6] to-[#3fd0ff]" initial={{ width: 0 }} animate={{ width: `${Math.max(0, Math.min(100, fin.margin * 100))}%` }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
           </div>
         </motion.section>
 
@@ -151,11 +152,11 @@ function OwnerHome() {
           <h2 className="font-display text-xl font-bold tracking-tight">{d.home.topSellers}</h2>
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             {ranking.map(({ s, stats }, i) => (
-              <div key={s.id} className={`rounded-2xl p-5 ${i === 0 ? "bg-sky-soft ring-1 ring-sky/30" : "bg-mist"}`}>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold">
-                    <span className="mr-2 text-ink-faint">#{i + 1}</span>
-                    {s.name}
+              <div key={s.id} className={`rounded-2xl p-5 ${i === 0 ? "bg-gradient-to-br from-[#e6f8ff] to-[#d3f1ff] ring-1 ring-sky/30" : "bg-[#f2f7fb]"}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-3 font-bold">
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-display text-sm font-extrabold ${i === 0 ? "bg-gradient-to-br from-[#035e94] to-[#3fd0ff] text-white" : "bg-white text-ink-soft ring-1 ring-line"}`}>{i + 1}</span>
+                    <span className="truncate">{s.name}</span>
                   </span>
                   <span className="text-xs font-bold text-ink-faint">{num(stats.orders)} {d.home.orders}</span>
                 </div>
@@ -243,7 +244,7 @@ function SellerHome({ user }: { user: User }) {
           <Sparkline values={cumulative.length > 1 ? cumulative : [0, 0]} className="mt-6 h-20 w-full" />
         </motion.section>
 
-        <motion.section {...rise(2)} className="relative overflow-hidden rounded-[22px] bg-ink p-7 text-white lg:col-span-7">
+        <motion.section {...rise(2)} className="relative overflow-hidden rounded-[24px] p-7 text-white lg:col-span-7" style={{ background: "linear-gradient(135deg, #035e94 0%, #0096d6 55%, #3fd0ff 100%)" }}>
           <div className="pointer-events-none absolute -bottom-16 -right-10 h-48 w-48 rounded-full bg-sky/40 blur-3xl" />
           <p className="label !text-white/60">{d.home.commission}</p>
           <p className="tabular mt-3 font-display text-4xl font-extrabold tracking-tight">{money(stats.commission)}</p>

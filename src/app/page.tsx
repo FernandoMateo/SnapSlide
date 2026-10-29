@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { B2BSection } from "@/components/landing/B2BSection";
+import { DistributorSteps } from "@/components/landing/DistributorSteps";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
 import { IntroSheet } from "@/components/landing/IntroSheet";
@@ -36,6 +37,7 @@ export default function LandingPage() {
         <Manifesto />
         <BoxStory />
         <StudioSection />
+        <DistributorSteps />
         <B2BSection />
       </main>
       <Footer />

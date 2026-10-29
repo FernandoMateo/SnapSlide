@@ -55,24 +55,38 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   // "Inicio" y "Ventas" son prefijos de otras rutas: solo se marcan con coincidencia exacta.
   const isActive = (href: string) => (href === "/dashboard" || href === "/dashboard/sales" ? pathname === href : pathname.startsWith(href));
 
+  const roleLabel = user.role === "owner" ? d.dash.roleOwner : d.dash.roleSeller;
+  const signOut = () => {
+    logout();
+    router.push("/login");
+  };
+
   return (
-    <div className="min-h-[100svh] bg-mist">
-      {/* Sidebar escritorio */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-white/80 px-4 py-6 backdrop-blur-xl lg:flex">
-        <Link href="/" className="px-3">
-          <Logo className="h-12" />
+    <div className="dash-bg min-h-[100svh]">
+      {/* Sidebar escritorio: panel oscuro flotante */}
+      <aside className="fixed inset-y-3 left-3 z-40 hidden w-64 flex-col overflow-hidden rounded-[28px] px-4 py-6 text-white shadow-[0_30px_60px_-30px_rgba(3,16,31,0.8)] lg:flex" style={{ background: "linear-gradient(180deg, #06203a 0%, #04121f 100%)" }}>
+        <div className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-[#00bfff]/25 blur-3xl" />
+        <Link href="/" className="relative px-3">
+          <Logo className="h-11" tone="light" />
         </Link>
-        <nav className="mt-10 grid gap-1">
+        <p className="relative mt-10 px-3 text-[0.62rem] font-bold uppercase tracking-[0.24em] text-white/35">{d.dash.menu}</p>
+        <nav className="relative mt-3 grid gap-1">
           {nav.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition-colors ${active ? "text-ink" : "text-ink-soft hover:bg-mist hover:text-ink"}`}
+                className={`relative flex h-11 items-center gap-3 rounded-2xl px-3 text-sm font-bold transition-colors ${active ? "text-white" : "text-white/55 hover:bg-white/5 hover:text-white"}`}
               >
-                {active && <motion.span layoutId="nav-active" className="absolute inset-0 rounded-xl bg-sky-soft ring-1 ring-sky/25" transition={{ type: "spring", duration: 0.4, bounce: 0.12 }} />}
-                <svg viewBox="0 0 24 24" className={`relative h-5 w-5 ${active ? "text-sky-deep" : ""}`} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0096d6] to-[#3fd0ff] shadow-[0_10px_24px_-10px_rgba(0,191,255,0.8)]"
+                    transition={{ type: "spring", duration: 0.45, bounce: 0.15 }}
+                  />
+                )}
+                <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   {ICON[item.key]}
                 </svg>
                 <span className="relative">{item.label}</span>
@@ -81,58 +95,67 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="mt-auto grid gap-3">
-          <button
-            onClick={() => window.confirm(d.dash.resetConfirm) && resetDemo()}
-            className="rounded-xl px-3 py-2 text-left text-xs font-semibold text-ink-faint hover:bg-mist hover:text-ink"
-          >
+        <div className="relative mt-auto grid gap-2">
+          <button onClick={() => window.confirm(d.dash.resetConfirm) && resetDemo()} className="rounded-xl px-3 py-2 text-left text-xs font-semibold text-white/40 transition-colors hover:bg-white/5 hover:text-white">
             ↺ {d.dash.resetDemo}
           </button>
-          <UserCard name={user.name} role={user.role === "owner" ? d.dash.roleOwner : d.dash.roleSeller} owner={user.role === "owner"} />
-          <button onClick={() => { logout(); router.push("/login"); }} className="btn btn-ghost h-10 text-sm">
-            {d.dash.logout}
-          </button>
+          <div className="flex items-center gap-3 rounded-2xl bg-white/[0.06] p-3 ring-1 ring-white/10">
+            <Avatar name={user.name} owner={user.role === "owner"} />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-bold">{user.name}</span>
+              <span className="block truncate text-xs text-white/50">{roleLabel}</span>
+            </span>
+            <button onClick={signOut} aria-label={d.dash.logout} title={d.dash.logout} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white/50 transition-colors hover:bg-white/10 hover:text-white">
+              <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
+              </svg>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Barra superior */}
-      <header className="sticky top-0 z-30 border-b border-line bg-white/75 backdrop-blur-xl lg:ml-64">
-        <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-8">
+      {/* Barra superior: vidrio esmerilado */}
+      <header className="sticky top-0 z-30 lg:ml-[17.5rem]">
+        <div className="flex h-16 items-center justify-between gap-3 border-b border-white/60 bg-white/60 px-4 backdrop-blur-xl sm:px-8 lg:h-[76px] lg:border-0 lg:bg-transparent lg:backdrop-blur-none">
           <Link href="/" className="lg:hidden">
             <Logo className="h-9" />
           </Link>
           <p className="hidden text-sm text-ink-soft lg:block">
-            {d.dash.greeting}, <span className="font-bold text-ink">{user.name}</span>
+            {d.dash.greeting}, <span className="font-bold text-ink">{user.name.split(" ")[0]}</span>
           </p>
           <div className="flex items-center gap-2">
             <LanguageToggle />
-            <span className={`hidden rounded-full px-3 py-1.5 text-xs font-bold sm:inline ${user.role === "owner" ? "bg-ink text-white" : "bg-sky-soft text-sky-deep"}`}>
-              {user.role === "owner" ? d.dash.roleOwner : d.dash.roleSeller}
+            <span className={`hidden rounded-full px-3 py-1.5 text-xs font-bold sm:inline ${user.role === "owner" ? "bg-ink text-white" : "bg-sky-soft text-sky-deep"}`}>{roleLabel}</span>
+            <span className="lg:hidden">
+              <Avatar name={user.name} owner={user.role === "owner"} small />
             </span>
-            <button onClick={() => { logout(); router.push("/login"); }} className="btn btn-ghost h-9 px-3 text-xs lg:hidden">
-              {d.dash.logout}
+            <button onClick={signOut} aria-label={d.dash.logout} className="grid h-9 w-9 place-items-center rounded-full bg-white text-ink-soft ring-1 ring-line lg:hidden">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
+              </svg>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="px-4 pb-28 pt-8 sm:px-8 lg:ml-64 lg:pb-16">
-        <motion.div key={pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }} className="mx-auto max-w-[1400px]">
+      <main className="px-4 pb-32 pt-6 sm:px-8 lg:ml-[17.5rem] lg:pb-16 lg:pt-2">
+        <motion.div key={pathname} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} className="mx-auto max-w-[1400px]">
           {children}
         </motion.div>
       </main>
 
-      {/* Navegación inferior móvil */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
+      {/* Navegación inferior móvil: barra flotante */}
+      <nav className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 rounded-[24px] bg-[#04121f]/92 p-1.5 shadow-[0_20px_40px_-16px_rgba(3,16,31,0.7)] backdrop-blur-xl lg:hidden">
         <div className="grid" style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}>
           {nav.map((item) => {
             const active = isActive(item.href);
             return (
-              <Link key={item.href} href={item.href} className={`flex h-16 flex-col items-center justify-center gap-1 text-[0.62rem] font-bold ${active ? "text-sky-deep" : "text-ink-faint"}`}>
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <Link key={item.href} href={item.href} className={`relative flex h-14 flex-col items-center justify-center gap-1 rounded-[18px] text-[0.6rem] font-bold ${active ? "text-white" : "text-white/50"}`}>
+                {active && <motion.span layoutId="nav-active-m" className="absolute inset-0 rounded-[18px] bg-gradient-to-b from-[#0096d6] to-[#3fd0ff]" transition={{ type: "spring", duration: 0.4, bounce: 0.15 }} />}
+                <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   {ICON[item.key]}
                 </svg>
-                <span className="max-w-full truncate px-1">{item.label}</span>
+                <span className="relative max-w-full truncate px-1">{item.label}</span>
               </Link>
             );
           })}
@@ -142,14 +165,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function UserCard({ name, role, owner }: { name: string; role: string; owner: boolean }) {
+function Avatar({ name, owner, small }: { name: string; owner: boolean; small?: boolean }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-mist px-3 py-3">
-      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full font-extrabold ${owner ? "bg-ink text-white" : "bg-sky text-white"}`}>{name[0]}</span>
-      <span className="min-w-0">
-        <span className="block truncate text-sm font-bold">{name}</span>
-        <span className="block truncate text-xs text-ink-faint">{role}</span>
-      </span>
-    </div>
+    <span
+      className={`grid shrink-0 place-items-center rounded-full font-extrabold text-white ${small ? "h-9 w-9 text-sm" : "h-10 w-10"}`}
+      style={{ background: owner ? "linear-gradient(135deg, #0b1b2b, #035e94)" : "linear-gradient(135deg, #0096d6, #3fd0ff)" }}
+    >
+      {name[0]}
+    </span>
   );
 }
