@@ -117,6 +117,8 @@ git push -u origin main
 
 ## Despliegue en VPS (recomendado)
 
+**En producción:** <https://snap-slide.com> · VPS GoDaddy AlmaLinux 10 (`208.109.245.55`) · DNS en GoDaddy: `A @ → 208.109.245.55`, `CNAME www → snap-slide.com` · nginx en `/etc/nginx/conf.d/snapslide.conf` (= `deploy/nginx.conf`) · certificado Let's Encrypt con certbot en `/opt/certbot` (venv; el paquete de EPEL no instala en AlmaLinux 10) y renovación con `certbot-renew.timer`.
+
 Todo corre en un solo servidor (Ubuntu 22.04/24.04, 1 GB de RAM alcanza): Next.js con PM2, PocketBase con systemd y Nginx delante con HTTPS. Los archivos de configuración están en `deploy/`.
 
 ```bash
@@ -132,7 +134,7 @@ cd /var/www/snapslide
 
 # 3. Variables (NEXT_PUBLIC_* se graban en el build: definirlas ANTES de compilar)
 cp .env.example .env.production
-nano .env.production          # NEXT_PUBLIC_SITE_URL=https://tudominio.com
+nano .env.production          # NEXT_PUBLIC_SITE_URL=https://snap-slide.com
 
 # 4. Build y arranque
 npm ci
@@ -149,9 +151,9 @@ sudo certbot --nginx -d tudominio.com -d www.tudominio.com
 **Actualizar después de un cambio:** `git pull && npm ci && npm run build && pm2 reload snapslide`.
 
 **Comprobar que todo está bien:**
-- `https://tudominio.com/robots.txt` y `/sitemap.xml` deben mostrar el dominio real (si muestran `localhost`, faltó `NEXT_PUBLIC_SITE_URL` antes del build).
+- `https://snap-slide.com/robots.txt` y `/sitemap.xml` deben mostrar el dominio real (si muestran `localhost`, faltó `NEXT_PUBLIC_SITE_URL` antes del build).
 - Comparte la URL en WhatsApp o prueba en <https://www.opengraph.xyz> para ver la tarjeta con la imagen.
-- Da de alta el dominio en Google Search Console y envía `https://tudominio.com/sitemap.xml`.
+- Da de alta el dominio en Google Search Console y envía `https://snap-slide.com/sitemap.xml`.
 
 **PocketBase en el mismo VPS** (cuando el frontend se conecte): descarga el binario de Linux en `pocketbase/`, crea el usuario `snapslide`, copia `deploy/pocketbase.service` a `/etc/systemd/system/` y activa `systemctl enable --now pocketbase`. El bloque `api.` de `deploy/nginx.conf` lo publica con HTTPS.
 
