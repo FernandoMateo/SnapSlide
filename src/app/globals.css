@@ -240,25 +240,45 @@ body {
   }
 }
 
-/* Pétalos celestes */
-@keyframes petal-fall {
-  from {
-    transform: translate3d(0, -12vh, 0);
+/* Burbujas de jabón que suben por la página */
+@keyframes bubble-rise {
+  0% {
+    transform: translate3d(0, 112vh, 0);
+    opacity: 0;
   }
-  to {
-    transform: translate3d(-8vw, 112vh, 0);
+  8% {
+    opacity: 0.9;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(5vw, -14vh, 0);
+    opacity: 0;
   }
 }
 
-@keyframes petal-sway {
+@keyframes bubble-sway {
   from {
-    transform: translateX(-28px) rotate(-30deg);
+    transform: translateX(-24px);
   }
   to {
-    transform: translateX(28px) rotate(42deg);
+    transform: translateX(24px);
   }
 }
 
+/* La película se deforma un poco, como una burbuja real */
+@keyframes bubble-wobble {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.05, 0.95);
+  }
+}
+
+/* Pétalos celestes junto a los títulos */
 @keyframes petal-bob {
   0%,
   100% {

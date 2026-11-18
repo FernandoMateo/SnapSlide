@@ -9,7 +9,7 @@ import { Hero } from "@/components/landing/Hero";
 import { IntroSheet } from "@/components/landing/IntroSheet";
 import { Manifesto } from "@/components/landing/Manifesto";
 import { Navbar } from "@/components/landing/Navbar";
-import { PetalDrift } from "@/components/fx/Petals";
+import { BubbleDrift } from "@/components/fx/Bubbles";
 import { StudioSection } from "@/components/landing/StudioSection";
 import { BoxStory } from "@/components/product/BoxStory";
 
@@ -30,7 +30,7 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
-      <PetalDrift />
+      <BubbleDrift />
       <Navbar />
       <main>
         <Hero ready={introDone} />
