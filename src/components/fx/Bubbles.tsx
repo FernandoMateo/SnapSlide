@@ -50,6 +50,14 @@ const DRIFT = [
   { left: 94, size: 34, dur: 25, delay: -16, sway: 8, desktop: true },
   { left: 22, size: 16, dur: 13, delay: -11, sway: 4, desktop: true },
   { left: 63, size: 18, dur: 14, delay: -1, sway: 4, desktop: true },
+  { left: 10, size: 24, dur: 17, delay: -13, sway: 6, desktop: false },
+  { left: 44, size: 32, dur: 21, delay: -4, sway: 7, desktop: false },
+  { left: 81, size: 18, dur: 14, delay: -10, sway: 4, desktop: false },
+  { left: 33, size: 42, dur: 26, delay: -22, sway: 9, desktop: true },
+  { left: 53, size: 14, dur: 12, delay: -8, sway: 4, desktop: true },
+  { left: 72, size: 30, dur: 20, delay: -17, sway: 7, desktop: true },
+  { left: 90, size: 48, dur: 27, delay: -11, sway: 10, desktop: true },
+  { left: 1, size: 20, dur: 15, delay: -19, sway: 5, desktop: true },
 ];
 
 export function BubbleDrift() {
